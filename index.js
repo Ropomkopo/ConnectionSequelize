@@ -24,6 +24,37 @@ db.sequelize = sequelize;
 db.tutorials = require("./tutorial.model.js")(sequelize, Sequelize);
 db.sequelize.sync();
 
+app.get('/getAll', async (req, res) => {
+    const data = await db.tutorials.findAll({
+        where: {}
+    });
+   console.log('return data about all click => ', data);
+    res.sendFile(__dirname + '/index.html');
+});
+
+
+app.get('/findOne:', async (req, res) => {
+    const user = await db.tutorials.findByPk(req.params.id)
+        .then(data => {
+            res.send(data);
+            console.log('First User =>', user);
+        })
+        .catch(err => {
+            res.status(500).send({
+                message: "Error retrieving Tutorial with id=" + id
+            });
+        });
+})
+
+app.get('/create', async (req, res) => {
+    await db.tutorials.create({
+        title: 'req.body.title',
+        description: 'req.body.description',
+        published: false
+    })
+    res.sendFile(__dirname + '/index.html');
+});
+
 io.on('connection', (socket) => {
     console.log('a user connected');
     socket.on('disconnect', () => {
